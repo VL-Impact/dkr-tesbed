@@ -1,0 +1,78 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    hostname: postgres_db
+    environment:
+      POSTGRES_PASSWORD: changeme
+    user: postgres                          
+    healthcheck:                            
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5      
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - './config/postgres/01-init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql'
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@example.com
+      PGADMIN_DEFAULT_PASSWORD: changeme
+    ports:
+      - 8090:80
+    volumes:
+      - './config/pgadmin/servers.json:/pgadmin4/servers.json'
+    depends_on:
+      - "postgres"
+
+
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus
+    restart: always
+    ports: 
+      - 9090:9090
+    volumes:
+      - prometheus_data:/prometheus
+      - './config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
+
+
+  consul:
+    image: consul
+    hostname: consul
+    restart: always
+    ports: 
+      - 8500:8500
+      - 8600:8600/udp
+    healthcheck:
+      test: curl -s http://localhost:8500/v1/health/checks/consul || exit 1
+      interval: 5s
+      timeout: 5s
+    volumes:
+      - './config/consul/consul.json:/consul/config/consul.json'      
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+
+#  tdb_app:
+#    restart: always
+#    #network_mode: "host"
+#    image: tdb
+#    hostname: tdb
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#      consul:
+#        condition: service_started
+#      prometheus:
+#        condition: service_started
+
+volumes:
+  postgresql_data:
+  prometheus_data:
