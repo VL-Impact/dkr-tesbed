@@ -17,7 +17,7 @@ services:
       - 5432:5432
     volumes:
       - postgresql_data:/var/lib/postgresql/data
-#      - './config/postgres/01-init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql'
+      - './config/postgres/01-init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql'
 
 
   pgadmin:
@@ -28,8 +28,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: changeme
     ports:
       - 8090:80
-#    volumes:
-#      - './config/pgadmin/servers.json:/pgadmin4/servers.json'
+    volumes:
+      - './config/pgadmin/servers.json:/pgadmin4/servers.json'
     depends_on:
       - "postgres"
 
@@ -42,7 +42,7 @@ services:
       - 9090:9090
     volumes:
       - prometheus_data:/prometheus
- #     - './config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
+      - './config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
 
 
   consul:
@@ -56,8 +56,8 @@ services:
       test: curl -s http://localhost:8500/v1/health/checks/consul || exit 1
       interval: 5s
       timeout: 5s
- #   volumes:
- #     - './config/consul/consul.json:/consul/config/consul.json'      
+    volumes:
+      - './config/consul/consul.json:/consul/config/consul.json'      
     command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
 
 #  tdb_app:
