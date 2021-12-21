@@ -60,6 +60,16 @@ services:
       - './config/consul/consul.json:/consul/config/consul.json'      
     command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
 
+  activemq:
+    image: rmohr/activemq
+    restart: always
+    ports: 
+      - 61616:61616
+      - 8161:8161
+    volumes:
+      - activemq_data:/opt/activemq/data
+      
+      
 #  tdb_app:
 #    restart: always
 #    #network_mode: "host"
@@ -76,3 +86,5 @@ services:
 volumes:
   postgresql_data:
   prometheus_data:
+  activemq_data:
+
