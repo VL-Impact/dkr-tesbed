@@ -1,6 +1,6 @@
 node('with-docker-compose')  {
     
-    stage('Check env) { 
+    stage('Check env') { 
         sh 'pwd'
         sh 'ls -la'
     }
